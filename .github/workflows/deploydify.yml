@@ -1,0 +1,24 @@
+name: Auto-Update Dify
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Mise à jour quotidienne à minuit
+  workflow_dispatch:  # Déclenchable manuellement
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: |
+          git pull origin main
+          git submodule update --init --recursive
+
+      - name: Build and Restart Docker
+        run: |
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
